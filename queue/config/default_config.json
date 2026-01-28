@@ -1,0 +1,145 @@
+{
+  "active_cluster": "server_102",
+  "remote_server": {
+    "hostname": "10.10.69.102",
+    "username": "zyy",
+    "password": "zyy249720",
+    "port": 22
+  },
+  "remote_paths": {
+    "work_base": ".",
+    "sisso_base": "SISSO_JOBS",
+    "vasp_base": "VASP_JOBS",
+    "aims_base": "AIMS_JOBS",
+    "ase_base": "ASE_JOBS",
+    "ml_base": "ML_JOBS"
+  },
+  "local_paths": {
+    "data_dir": "./data",
+    "results_root": "./outputs",
+    "results_dir": "./outputs",
+    "temp_dir": "./temp",
+    "elements_csv": "elements_properties_all.csv"
+  },
+  "queue_system": {
+    "type": "slurm",
+    "poll_interval": 5,
+    "max_wait_time": 1800
+  },
+  "llm": {
+    "provider": "deepseek",
+    "api_key": "",
+    "api_base": "https://api.deepseek.com",
+    "model": "deepseek-chat",
+    "temperature": 0.1
+  },
+  "modules": {
+    "ml_prediction": {
+      "tasks": {
+        "trad_ml": {
+          "command": "python model.py",
+          "env_lines": [
+            "source ~/.bashrc",
+            "conda activate ml_prediction"
+          ]
+        },
+        "gnn": {
+          "command": "python run_gnn.py",
+          "env_lines": [
+            "source ~/.bashrc",
+            "conda activate ml_prediction"
+          ]
+        },
+        "sisso": {
+          "command": "mpirun -np $(nproc) SISSO",
+          "env_lines": [
+            "source ~/.bashrc",
+            "conda activate sisso"
+          ]
+        }
+      }
+    },
+    "high_throughput": {
+      "tasks": {
+        "vasp_opt": {
+          "command": "mpirun -np $(nproc) vasp_gam",
+          "env_lines": [
+            "source /Public/home/zyy/intel/oneapi/setvars.sh intel64 > /dev/null 2>&1",
+            "export PATH=/Public/home/zyy/soft/vasp.6.3.2_c/bin:$PATH"
+          ]
+        },
+        "vasp_static": {
+          "command": "mpirun -np $(nproc) vasp_gam",
+          "env_lines": [
+            "source /Public/home/zyy/intel/oneapi/setvars.sh intel64 > /dev/null 2>&1",
+            "export PATH=/Public/home/zyy/soft/vasp.6.3.2_c/bin:$PATH"
+          ]
+        },
+        "aims_opt": {
+          "command": "mpirun -np $(nproc) aims.x > aims.out 2>&1",
+          "env_lines": [
+            "module load aims 2>/dev/null || module load FHIaims 2>/dev/null || echo \"aims module not loaded\"",
+            "export OMP_NUM_THREADS=1",
+            "export TMPDIR=/tmp"
+          ]
+        },
+        "aims_static": {
+          "command": "mpirun -np $(nproc) aims.x > aims.out 2>&1",
+          "env_lines": [
+            "module load aims 2>/dev/null || module load FHIaims 2>/dev/null || echo \"aims module not loaded\"",
+            "export OMP_NUM_THREADS=1",
+            "export TMPDIR=/tmp"
+          ]
+        },
+        "ase_opt": {
+          "command": "python calc.py",
+          "env_lines": [
+            "source ~/.bashrc",
+            "conda activate ase"
+          ]
+        }
+      }
+    }
+  },
+  "commands": {
+    "trad_ml": "python model.py",
+    "gnn": "python run_gnn.py",
+    "sisso": "mpirun -np $(nproc) SISSO"
+  },
+  "clusters": {
+    "server_102": {
+      "remote_server": {
+        "hostname": "10.10.69.102",
+        "username": "zyy",
+        "password": "zyy249720",
+        "port": 22
+      },
+      "executor": {
+        "type": "slurm",
+        "slurm": {
+          "header_file": "queue/slurm/server_102.header"
+        }
+      },
+      "queue": {
+        "partition": "vasp"
+      }
+    },
+    "server_43": {
+      "remote_server": {
+        "hostname": "10.10.69.43",
+        "username": "likai",
+        "password": "13579",
+        "port": 22
+      },
+      "executor": {
+        "type": "slurm",
+        "slurm": {
+          "header_file": "queue/slurm/server_43.header"
+        }
+      },
+      "queue": {
+        "partition": "vasp"
+      }
+    }
+  }
+}

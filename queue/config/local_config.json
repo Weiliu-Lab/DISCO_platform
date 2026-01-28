@@ -1,0 +1,8 @@
+{
+  "llm": {
+    "api_key": "sk-009fa4895d4246daafdd25f2a5902356",
+    "api_base": "https://api.deepseek.com",
+    "model": "deepseek-chat",
+    "temperature": 0.1
+  }
+}

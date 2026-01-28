@@ -1,0 +1,5 @@
+#!/bin/bash
+#SBATCH --job-name=zyy
+#SBATCH --nodes=1
+#SBATCH --exclusive
+#SBATCH --partition=vasp

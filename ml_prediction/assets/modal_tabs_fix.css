@@ -1,0 +1,12 @@
+/* Local override CSS loaded via /_local_assets/modal_tabs_fix.css
+   Reason: Dash assets_folder points to crystal_toolkit assets, so descriptor/assets is not auto-loaded.
+*/
+
+#modal-file-editor .nav-tabs .nav-link {
+    color: #0f172a !important;
+    font-weight: 600;
+}
+
+#modal-file-editor .nav-tabs .nav-link.active {
+    color: #2563eb !important;
+}
