@@ -1,0 +1,50 @@
+services:
+  web:
+    image: discplatform-app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /appcode
+    command: /bin/bash -c "/opt/venv/bin/python backend/manage.py migrate --noinput && /opt/venv/bin/python backend/manage.py collectstatic --noinput --clear && /bin/bash start_services.sh"
+    environment:
+      DJANGO_DEBUG: "false"
+      DJANGO_ALLOWED_HOSTS: "discoplatform.cn,localhost,127.0.0.1"
+      DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY:-change-me}"
+      HTC_URL_PREFIX: "/htc/"
+      ML_URL_PREFIX: "/ml/"
+      DISCOPILOT_URL_PREFIX: "/DISCOpilot/"
+    volumes:
+      - ./outputs:/appcode/outputs
+      - static:/appcode/backend/staticfiles
+    expose:
+      - "5000"
+      - "8050"
+      - "8051"
+      - "8054"
+    restart: unless-stopped
+
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    restart: unless-stopped
+    environment:
+      STORAGE_DIR: /app/server/storage
+    volumes:
+      - /opt/anythingllm:/app/server/storage
+      - /opt/anythingllm/.env:/app/server/.env
+    ports:
+      - "3001:3001"
+
+  nginx:
+    image: nginx:1.25-alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+    volumes:
+      - ./deploy/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - static:/var/www/static:ro
+      - ./docs/_build/html:/var/www/docs:ro
+
+volumes:
+  static:
